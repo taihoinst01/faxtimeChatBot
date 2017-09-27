@@ -5,6 +5,8 @@ using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 
+using System.Diagnostics;
+
 namespace SecCsChatBotDemo
 {
     [BotAuthentication]
@@ -16,9 +18,25 @@ namespace SecCsChatBotDemo
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
-            if (activity.Type == ActivityTypes.Message)
+            //HttpResponseMessage response;
+
+            if (activity.Type == ActivityTypes.ConversationUpdate)
+            {   
+                //  && activity.MembersAdded.Any(m => m.Id == activity.Recipient.Id)
+                Debug.WriteLine("* activity.Type : " + activity.Type);
+                Debug.WriteLine("* ActivityTypes.ConversationUpdate : " + ActivityTypes.ConversationUpdate);
+                //Debug.WriteLine("* m => m.Id : " + m => m.Id);
+                Debug.WriteLine("* activity.Recipient.Id : " + activity.Recipient.Id);
+                Debug.WriteLine("* activity.ServiceUrl : " + activity.ServiceUrl);
+            }
+            else if (activity.Type == ActivityTypes.Message)
             {
                 await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                Debug.WriteLine("* activity.Type == ActivityTypes.Message ");
+
+                string orgMent = "";
+                orgMent = activity.Text;
+                Debug.WriteLine("* orgMent : "+ orgMent);
             }
             else
             {
