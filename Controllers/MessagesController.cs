@@ -1,10 +1,13 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
-
+using SecCsChatBotDemo.DB;
+using System.Collections.Generic;
+using SecCsChatBotDemo.Models;
 using System.Diagnostics;
 
 namespace SecCsChatBotDemo
@@ -21,13 +24,33 @@ namespace SecCsChatBotDemo
             //HttpResponseMessage response;
 
             if (activity.Type == ActivityTypes.ConversationUpdate)
-            {   
+            {
+                DateTime startTime = DateTime.Now;
+
+                // Db
+                //DbConnect db = new DbConnect();
+                //List<DialogList> dlg = db.SelectInitDialog();
+                //Debug.WriteLine("!!!!!!!!!!! : " + dlg[0].dlgId);
+
+                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                Activity reply2 = activity.CreateReply();
+                reply2.Recipient = activity.From;
+                reply2.Type = "message";
+                reply2.Attachments = new List<Attachment>();
+                reply2.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
                 //  && activity.MembersAdded.Any(m => m.Id == activity.Recipient.Id)
                 Debug.WriteLine("* activity.Type : " + activity.Type);
                 Debug.WriteLine("* ActivityTypes.ConversationUpdate : " + ActivityTypes.ConversationUpdate);
                 //Debug.WriteLine("* m => m.Id : " + m => m.Id);
                 Debug.WriteLine("* activity.Recipient.Id : " + activity.Recipient.Id);
                 Debug.WriteLine("* activity.ServiceUrl : " + activity.ServiceUrl);
+                var welcome = "";
+                var welcomeMsg = "";
+                //welcome = await connector.Conversations.SendToConversationAsync(welcomeMsg);
+
+
             }
             else if (activity.Type == ActivityTypes.Message)
             {
