@@ -27,7 +27,7 @@ namespace SecCsChatBotDemo
             {
                 DateTime startTime = DateTime.Now;
 
-                // Db
+                //Db
                 //DbConnect db = new DbConnect();
                 //List<DialogList> dlg = db.SelectInitDialog();
                 //Debug.WriteLine("!!!!!!!!!!! : " + dlg[0].dlgId);
