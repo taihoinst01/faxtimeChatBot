@@ -12,7 +12,7 @@ namespace SecCsChatBotDemo.DB
 {
     public class DbConnect
     {
-        string connStr = "Data Source=faxtimedb.database.windows.net;Initial Catalog=taihoLab;User ID=faxtime;Password=test2016!;";
+        string connStr = "Data Source=taihoinst.database.windows.net;Initial Catalog=taihoLab;User ID=taihoinst;Password=taiho123@;";
         StringBuilder sb = new StringBuilder();
 
         public List<DialogList> SelectInitDialog()
@@ -25,7 +25,8 @@ namespace SecCsChatBotDemo.DB
                 conn.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_LANG FROM TBL_DLG WHERE DLG_TYPE = '1' AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY DLG_ID";
+                cmd.CommandText = "SELECT DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_LANG FROM TBL_SECCS_DLG WHERE DLG_TYPE = '1' AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY DLG_ID";
+                //cmd.CommandText = "SELECT DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_LANG FROM TBL_DLG WHERE DLG_TYPE = '1' AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY DLG_ID";
 
                 rdr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
 
@@ -41,8 +42,9 @@ namespace SecCsChatBotDemo.DB
                     dlg.dlgName = dlgName;
                     dlg.dlgDescription = dlgDescription;
                     dlg.dlgLang = dlgLang;
-
+                    Debug.WriteLine("dlg.DLG_NM : " + dlg.dlgName);
                     dialog.Add(dlg);
+
                 }
             }
             return dialog;
@@ -58,6 +60,7 @@ namespace SecCsChatBotDemo.DB
                 conn.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
+                //cmd.CommandText = "SELECT DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_LANG, DLG_TYPE FROM TBL_DLG WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY DLG_ID";
                 cmd.CommandText = "SELECT DLG_ID, DLG_NAME, DLG_DESCRIPTION, DLG_LANG, DLG_TYPE FROM TBL_SECCS_DLG WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY DLG_ID";
 
                 cmd.Parameters.AddWithValue("@dlgID", dlgID);
@@ -96,6 +99,7 @@ namespace SecCsChatBotDemo.DB
                 cmd.Connection = conn;
                 cmd.CommandText = "SELECT CARD_DLG_ID, DLG_ID, CARD_TITLE, CARD_SUBTITLE, CARD_TEXT, IMG_URL," +
                     "BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT, BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT, BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT " +
+                    //"FROM TBL_DLG_CARD WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY CARD_ORDER_NO";
                     "FROM TBL_SECCS_DLG_CARD WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999 ORDER BY CARD_ORDER_NO";
 
                 cmd.Parameters.AddWithValue("@dlgID", dlgID);
@@ -152,6 +156,7 @@ namespace SecCsChatBotDemo.DB
                 conn.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
+                //cmd.CommandText = "SELECT TEXT_DLG_ID, DLG_ID, CARD_TITLE, CARD_TEXT FROM TBL_DLG_TEXT WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999";
                 cmd.CommandText = "SELECT TEXT_DLG_ID, DLG_ID, CARD_TITLE, CARD_TEXT FROM TBL_SECCS_DLG_TEXT WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999";
 
                 cmd.Parameters.AddWithValue("@dlgID", dlgID);
@@ -191,8 +196,8 @@ namespace SecCsChatBotDemo.DB
                 cmd.Connection = conn;
                 cmd.CommandText = "SELECT MEDIA_DLG_ID, DLG_ID, CARD_TITLE, CARD_TEXT, MEDIA_URL," +
                     "BTN_1_TYPE, BTN_1_TITLE, BTN_1_CONTEXT, BTN_2_TYPE, BTN_2_TITLE, BTN_2_CONTEXT, BTN_3_TYPE, BTN_3_TITLE, BTN_3_CONTEXT " +
+                    //"FROM TBL_DLG_MEDIA WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999";
                     "FROM TBL_SECCS_DLG_MEDIA WHERE DLG_ID = @dlgID AND USE_YN = 'Y' AND DLG_ID > 999";
-
                 cmd.Parameters.AddWithValue("@dlgID", dlgID);
 
                 rdr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -248,10 +253,11 @@ namespace SecCsChatBotDemo.DB
                 cmd.Connection = conn;
                 cmd.CommandText = " SELECT RELATION_ID, LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, BEFORE_1_LUIS, BEFORE_1_INTENT, BEFORE_1_ENTITIES," +
                                   " BEFORE_2_LUIS, BEFORE_2_INTENT, BEFORE_2_ENTITIES, BEFORE_3_LUIS, BEFORE_3_INTENT, BEFORE_3_ENTITIES, DLG_ID, DLG_ORDER_NO " +
+                                  //" FROM TBL_DLG_RELATION_LUIS WHERE LUIS_INTENT = @intent" +
                                   " FROM TBL_SECCS_DLG_RELATION_LUIS WHERE LUIS_INTENT = @intent" +
                                   " AND LUIS_ENTITIES LIKE '%" + entities + "%'" +
                                   " AND USE_YN = 'Y' ORDER BY DLG_ORDER_NO";
-
+                Debug.WriteLine("* cmd.CommandText : "+ cmd.CommandText);
                 cmd.Parameters.AddWithValue("@intent", intent);
 
                 rdr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -264,7 +270,7 @@ namespace SecCsChatBotDemo.DB
                     LuisList luis = new LuisList();
                     luis.dlgId = dlgId;
                     luis.dlgOrderNo = dlgOrderNo;
-
+                    Debug.WriteLine("* dlgId : " + dlgId + " || dlgOrderNo : " + dlgOrderNo);
                     luisList.Add(luis);
                 }
             }
