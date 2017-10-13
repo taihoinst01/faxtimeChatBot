@@ -383,17 +383,18 @@ namespace SecCsChatBotDemo
                                             cardButtons.Add(plButton);
                                         }
 
-                                        /*
-                                        if (card[j].dlgId == '2009')
+                                        var strCardSubTitle = card[j].cardSubTitle;
+                                        if (card[j].dlgId == 2009)
                                         {
-                                            var customerInfo = userData.GetProperty<string>("luisCustomerInfo");
-
+                                            //var customerInfo = userData.GetProperty<string>("luisCustomerInfo");
+                                            strCardSubTitle = userData.GetProperty<string>("luisCustomerInfo");
                                         }
-                                        */
+                                        
                                         HeroCard plCard = new HeroCard()
                                         {
                                             Title = card[j].cardTitle,
-                                            Subtitle = card[j].cardSubTitle,
+                                            //Subtitle = card[j].cardSubTitle,
+                                            Subtitle = strCardSubTitle,
                                             Images = cardImages,
                                             Buttons = cardButtons
                                         };
