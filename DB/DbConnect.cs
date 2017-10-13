@@ -266,16 +266,62 @@ namespace SecCsChatBotDemo.DB
                 {
                     int dlgId = Convert.ToInt32(rdr["DLG_ID"]);
                     string dlgOrderNo = rdr["DLG_ORDER_NO"] as string;
+                    string dlgIntent = rdr["LUIS_INTENT"] as string;    //
+                    string dlgEntities = rdr["LUIS_ENTITIES"] as string;    //  
 
                     LuisList luis = new LuisList();
                     luis.dlgId = dlgId;
                     luis.dlgOrderNo = dlgOrderNo;
+                    luis.dlgIntent = dlgIntent;
+                    luis.dlgEntities = dlgEntities;
                     Debug.WriteLine("* dlgId : " + dlgId + " || dlgOrderNo : " + dlgOrderNo);
                     luisList.Add(luis);
                 }
             }
             return luisList;
         }
+
+        public List<LuisList> SelectLuisSecond(string orgment, string intent, String entities)
+        {
+            SqlDataReader rdr = null;
+            List<LuisList> luisList = new List<LuisList>();
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandText = " SELECT RELATION_ID, LUIS_ID, LUIS_INTENT, LUIS_ENTITIES, BEFORE_1_LUIS, BEFORE_1_INTENT, BEFORE_1_ENTITIES," +
+                                  " BEFORE_2_LUIS, BEFORE_2_INTENT, BEFORE_2_ENTITIES, BEFORE_3_LUIS, BEFORE_3_INTENT, BEFORE_3_ENTITIES, DLG_ID, DLG_ORDER_NO " +
+                                  " FROM TBL_SECCS_DLG_RELATION_LUIS WHERE LUIS_ENTITIES LIKE '%" + orgment + "%'" +
+                                  " AND BEFORE_1_INTENT = @intent" + 
+                                  " AND BEFORE_1_ENTITIES LIKE '%" + entities + "%'" +
+                                  " AND USE_YN = 'Y' ORDER BY DLG_ORDER_NO";
+                Debug.WriteLine("* cmd.CommandText : " + cmd.CommandText);
+                cmd.Parameters.AddWithValue("@intent", intent);
+
+                rdr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+                while (rdr.Read())
+                {
+                    int dlgId = Convert.ToInt32(rdr["DLG_ID"]);
+                    string dlgOrderNo = rdr["DLG_ORDER_NO"] as string;
+                    string dlgIntent = rdr["LUIS_INTENT"] as string;    //
+                    string dlgEntities = rdr["LUIS_ENTITIES"] as string;    //  
+
+                    LuisList luis = new LuisList();
+                    luis.dlgId = dlgId;
+                    luis.dlgOrderNo = dlgOrderNo;
+                    luis.dlgIntent = dlgIntent;
+                    luis.dlgEntities = dlgEntities;
+
+                    Debug.WriteLine("* dlgId : " + dlgId + " || dlgOrderNo : " + dlgOrderNo + " || dlgIntent : " + dlgIntent + " || dlgEntities : " + dlgEntities);
+                    luisList.Add(luis);
+                }
+            }
+            return luisList;
+        }
+
 
     }
 }

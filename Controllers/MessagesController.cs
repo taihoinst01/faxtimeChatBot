@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using System.Linq;
@@ -27,6 +28,13 @@ namespace SecCsChatBotDemo
         public readonly string MEDIADLG = "4";
         int userDataNum = 0;
 
+        int sessionNo = 0;
+        string[] strIntent = { };
+        string[] strEntity = { };
+
+
+
+
         /// <summary>
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
@@ -34,6 +42,9 @@ namespace SecCsChatBotDemo
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
             //HttpResponseMessage response;
+
+            var intentList = new List<string>();
+            var entityList = new List<string>();
 
             if (activity.Type == ActivityTypes.ConversationUpdate)
             {
@@ -230,16 +241,46 @@ namespace SecCsChatBotDemo
                 Debug.WriteLine("* Luis Entity Count : " + luisEntityCount);
                 Debug.WriteLine("* Luis Intents Score : " + luisScore);
 
+                //
+                //HttpContext context = HttpContext.Current;
+                //Debug.WriteLine("LUIS_INTENT : " + (string)Luis["intents"][0]["intent"]);
+                //System.Web.HttpContext.Current.Session["sessionString"] = sessionValue;
+                //context.Session["LUIS_INTENT"] = (string)Luis["intents"][0]["intent"];
+                //HttpContext.Current.Session["LUIS_INTENT"] = "luisIntent";
+                //context.Session["LUIS_ENTITY"] = (string)Luis["entities"][0]["entity"];
+                //context.Session["LUIS_INTENT"] = "";
+
                 if (luisScore > 0 && luisEntityCount > 0)
                 {
                     string intent = (string)Luis["intents"][0]["intent"];
                     string entity = (string)Luis["entities"][0]["entity"];
-                    Debug.WriteLine("* intent : " + intent + " || entity : " + entity);
+                    Debug.WriteLine("* 1. orgENGMent_history : " + orgENGMent_history);
                     intent = intent.Replace("\"", "");
                     entity = entity.Replace("\"", "");
                     entity = entity.Replace(" ", "");
+                    //Debug.WriteLine("* sessionNo : " + sessionNo ); 
+                    //Debug.WriteLine("LUIS_INTENT : " + (string)(context.Session["LUIS_INTENT"]));
+                    //Debug.WriteLine("LUIS_ENTITY : " + (string)(context.Session["LUIS_ENTITY"]));
+
+                    //
+                    sessionNo = sessionNo + 1;
+                    /*
+                    string[] arrIntent = { intent };
+                    string[] arrEntity = { entity };
+                    userData.SetProperty<string[]>(strIntent[sessionNo], intent.ToArray());
+                    userData.SetProperty<string[]>(strEntity[sessionNo], arrEntity);
+                    */
+
+                    //
+                    intentList.Add(intent);
+                    entityList.Add(entity);
+
+                    //userData.SetProperty<List>(IList, intentList);
+                    userData.SetProperty<string>("luisIntent", intent);
+                    userData.SetProperty<string>("luisEntity", entity);
 
                     userData.SetProperty<string>(intent, orgENGMent_history);
+                    Debug.WriteLine("* 2. orgENGMent_history : " + orgENGMent_history);
                     await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
                     Debug.WriteLine("* activity.ChannelId : " + activity.ChannelId + " || activity.From.Id : " + activity.From.Id);
 
@@ -256,7 +297,7 @@ namespace SecCsChatBotDemo
                     }
                     else
                     {
-                        Debug.WriteLine("* YES LuisDialogID || LuisDialogID.Count : "+ LuisDialogID.Count);
+                        Debug.WriteLine("* YES LuisDialogID || LuisDialogID.Count : " + LuisDialogID.Count);
 
                         for (int i = 0; i < LuisDialogID.Count; i++)
                         {
@@ -426,13 +467,229 @@ namespace SecCsChatBotDemo
                 else
                 {
                     Debug.WriteLine("* NO Luis Score.. ");
+                    Debug.WriteLine(userData.ToString());
+
+                    //
+                    var intentArray = intentList.ToArray();
+                    /*
+                    for (int i = 0; i < intentList.Count; i++)
+                    {
+                        Debug.WriteLine("* intentList[] :" + intentList[i]);
+
+                    }
+                    */
+                    foreach (string intent in intentList)
+                    {
+                        Debug.WriteLine("* intent[] :" + intent);
+                        //System.Console.WriteLine(prime);
+                    }
+                    Debug.WriteLine("intentList" + intentList);
+
+
+
                     Activity reply_err = activity.CreateReply();
+                    /*
                     reply_err.Recipient = activity.From;
                     reply_err.Type = "message";
                     reply_err.Text = "I'm sorry. I do not know what you mean.";
                     var reply1 = await connector.Conversations.SendToConversationAsync(reply_err);
-                }
+                    */
+                    //
+                    var luisIntent = userData.GetProperty<string>("luisIntent");
+                    var luisEntity = userData.GetProperty<string>("luisEntity");
+                    Debug.WriteLine("** orgMent : " + orgMent + "| luisIntent : " + luisIntent + " | luisEntity : " + luisEntity);
 
+                    List<LuisList> LuisDialogID = db.SelectLuisSecond(activity.Text, luisIntent, luisEntity);
+
+                    if (LuisDialogID.Count == 0)
+                    {
+                        Debug.WriteLine("** NO LuisDialogID");
+                        //Activity reply_err = activity.CreateReply();
+                        reply_err.Recipient = activity.From;
+                        reply_err.Type = "message";
+                        reply_err.Text = "I'm sorry. I do not know what you mean.";
+                        var reply1 = await connector.Conversations.SendToConversationAsync(reply_err);
+                        
+                    }
+                    else
+                    {
+                        Debug.WriteLine("** SelectLuisSecond() YES | LuisDialogID | LuisDialogID.Count : " + LuisDialogID.Count);
+
+                        for (int i = 0; i < LuisDialogID.Count; i++)
+                        {
+                            Activity reply2 = activity.CreateReply();
+                            reply2.Recipient = activity.From;
+                            reply2.Type = "message";
+                            reply2.Attachments = new List<Attachment>();
+                            reply2.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+                            int dlgID = LuisDialogID[i].dlgId;
+
+                            string dlgIntent = LuisDialogID[i].dlgIntent;
+                            string dlgEntities = LuisDialogID[i].dlgEntities;
+                            
+                            userData.SetProperty<string>("luisIntent", dlgIntent);
+                            userData.SetProperty<string>("luisEntity", dlgEntities);
+                            Debug.WriteLine("** userData.SetProperty > ("+ dlgID+") luisIntent: " + dlgIntent + "| luisEntity:" + dlgEntities);
+
+                            await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+
+                            List <DialogList> dlg = db.SelectDialog(dlgID);
+
+                            for (int n = 0; n < dlg.Count; n++)
+                            {
+                                string dlgType = dlg[n].dlgType;
+
+                                if (dlgType == TEXTDLG)
+                                {
+                                    List<TextList> text = db.SelectDialogText(dlg[n].dlgId);
+
+                                    for (int j = 0; j < text.Count; j++)
+                                    {
+                                        HeroCard plCard = new HeroCard()
+                                        {
+                                            Title = text[j].cardTitle,
+                                            Subtitle = text[j].cardText
+                                        };
+
+                                        Attachment plAttachment = plCard.ToAttachment();
+                                        reply2.Attachments.Add(plAttachment);
+                                    }
+                                }
+                                else if (dlgType == CARDDLG)
+                                {
+                                    List<CardList> card = db.SelectDialogCard(dlg[n].dlgId);
+
+                                    for (int j = 0; j < card.Count; j++)
+                                    {
+                                        List<CardImage> cardImages = new List<CardImage>();
+                                        List<CardAction> cardButtons = new List<CardAction>();
+
+                                        if (card[j].imgUrl != null)
+                                        {
+                                            cardImages.Add(new CardImage(url: card[j].imgUrl));
+                                        }
+
+                                        if (card[j].btn1Type != null)
+                                        {
+                                            CardAction plButton = new CardAction()
+                                            {
+                                                Value = card[j].btn1Context,
+                                                Type = card[j].btn1Type,
+                                                Title = card[j].btn1Title
+                                            };
+
+                                            cardButtons.Add(plButton);
+                                        }
+
+                                        if (card[j].btn2Type != null)
+                                        {
+                                            CardAction plButton = new CardAction()
+                                            {
+                                                Value = card[j].btn2Context,
+                                                Type = card[j].btn2Type,
+                                                Title = card[j].btn2Title
+                                            };
+
+                                            cardButtons.Add(plButton);
+                                        }
+
+                                        if (card[j].btn3Type != null)
+                                        {
+                                            CardAction plButton = new CardAction()
+                                            {
+                                                Value = card[j].btn3Context,
+                                                Type = card[j].btn3Type,
+                                                Title = card[j].btn3Title
+                                            };
+
+                                            cardButtons.Add(plButton);
+                                        }
+
+                                        HeroCard plCard = new HeroCard()
+                                        {
+                                            Title = card[j].cardTitle,
+                                            Subtitle = card[j].cardSubTitle,
+                                            Images = cardImages,
+                                            Buttons = cardButtons
+                                        };
+
+                                        Attachment plAttachment = plCard.ToAttachment();
+                                        reply2.Attachments.Add(plAttachment);
+                                    }
+                                }
+                                else if (dlgType == MEDIADLG)
+                                {
+                                    List<MediaList> media = db.SelectDialogMedia(dlg[n].dlgId);
+
+                                    for (int j = 0; j < media.Count; j++)
+                                    {
+                                        List<MediaUrl> mediaURL = new List<MediaUrl>();
+                                        List<CardAction> cardButtons = new List<CardAction>();
+
+                                        if (media[j].mediaUrl != null)
+                                        {
+                                            mediaURL.Add(new MediaUrl(url: media[j].mediaUrl));
+                                        }
+
+                                        if (media[j].btn1Type != null)
+                                        {
+                                            CardAction plButton = new CardAction()
+                                            {
+                                                Value = media[j].btn1Context,
+                                                Type = media[j].btn1Type,
+                                                Title = media[j].btn1Title
+                                            };
+
+                                            cardButtons.Add(plButton);
+                                        }
+
+                                        if (media[j].btn2Type != null)
+                                        {
+                                            CardAction plButton = new CardAction()
+                                            {
+                                                Value = media[j].btn2Context,
+                                                Type = media[j].btn2Type,
+                                                Title = media[j].btn2Title
+                                            };
+
+                                            cardButtons.Add(plButton);
+                                        }
+
+                                        if (media[j].btn3Type != null)
+                                        {
+                                            CardAction plButton = new CardAction()
+                                            {
+                                                Value = media[j].btn3Context,
+                                                Type = media[j].btn3Type,
+                                                Title = media[j].btn3Title
+                                            };
+
+                                            cardButtons.Add(plButton);
+                                        }
+
+                                        VideoCard plCard = new VideoCard()
+                                        {
+                                            Title = media[j].cardTitle,
+                                            Text = media[j].cardText,
+                                            Media = mediaURL,
+                                            Buttons = cardButtons,
+                                            Autostart = false
+                                        };
+
+                                        Attachment plAttachment = plCard.ToAttachment();
+                                        reply2.Attachments.Add(plAttachment);
+                                    }
+                                }
+                            }
+
+                            var reply1 = await connector.Conversations.SendToConversationAsync(reply2);
+                            
+                        }
+
+
+                    }
+                }
             }
             else
             {
@@ -501,6 +758,7 @@ namespace SecCsChatBotDemo
             }
             return jsonObj;
         }
+
 
 
 

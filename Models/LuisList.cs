@@ -9,5 +9,8 @@ namespace SecCsChatBotDemo.Models
     {
         public int dlgId;
         public string dlgOrderNo;
+
+        public string dlgIntent;
+        public string dlgEntities;
     }
 }
