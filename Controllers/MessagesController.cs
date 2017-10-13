@@ -242,19 +242,13 @@ namespace SecCsChatBotDemo
                 Debug.WriteLine("* Luis Intents Score : " + luisScore);
 
                 //
-                //HttpContext context = HttpContext.Current;
-                //Debug.WriteLine("LUIS_INTENT : " + (string)Luis["intents"][0]["intent"]);
-                //System.Web.HttpContext.Current.Session["sessionString"] = sessionValue;
-                //context.Session["LUIS_INTENT"] = (string)Luis["intents"][0]["intent"];
-                //HttpContext.Current.Session["LUIS_INTENT"] = "luisIntent";
-                //context.Session["LUIS_ENTITY"] = (string)Luis["entities"][0]["entity"];
-                //context.Session["LUIS_INTENT"] = "";
+ 
 
                 if (luisScore > 0 && luisEntityCount > 0)
                 {
                     string intent = (string)Luis["intents"][0]["intent"];
                     string entity = (string)Luis["entities"][0]["entity"];
-                    Debug.WriteLine("* 1. orgENGMent_history : " + orgENGMent_history);
+                    Debug.WriteLine("* 1.intent : " + intent + " || entity : "+ entity);
                     intent = intent.Replace("\"", "");
                     entity = entity.Replace("\"", "");
                     entity = entity.Replace(" ", "");
@@ -264,16 +258,22 @@ namespace SecCsChatBotDemo
 
                     //
                     sessionNo = sessionNo + 1;
-                    /*
-                    string[] arrIntent = { intent };
-                    string[] arrEntity = { entity };
-                    userData.SetProperty<string[]>(strIntent[sessionNo], intent.ToArray());
-                    userData.SetProperty<string[]>(strEntity[sessionNo], arrEntity);
-                    */
-
+ 
                     //
                     intentList.Add(intent);
                     entityList.Add(entity);
+
+                    // 
+                    if (intent == "customerInfo")
+                    {
+                        
+                        var luisCustomerInfo = userData.GetProperty<string>("luisCustomerInfo");
+                        luisCustomerInfo = luisCustomerInfo + "\n" + orgMent;
+                        userData.SetProperty<string>("luisCustomerInfo", luisCustomerInfo);
+                        Debug.WriteLine("1-1.intent : customerInfo || input : " + orgMent + " || luisCustomerInfo : " + luisCustomerInfo);
+
+                    }
+
 
                     //userData.SetProperty<List>(IList, intentList);
                     userData.SetProperty<string>("luisIntent", intent);
@@ -308,6 +308,8 @@ namespace SecCsChatBotDemo
                             reply2.AttachmentLayout = AttachmentLayoutTypes.Carousel;
 
                             int dlgID = LuisDialogID[i].dlgId;
+
+                            
 
                             List<DialogList> dlg = db.SelectDialog(dlgID);
 
@@ -381,6 +383,13 @@ namespace SecCsChatBotDemo
                                             cardButtons.Add(plButton);
                                         }
 
+                                        /*
+                                        if (card[j].dlgId == '2009')
+                                        {
+                                            var customerInfo = userData.GetProperty<string>("luisCustomerInfo");
+
+                                        }
+                                        */
                                         HeroCard plCard = new HeroCard()
                                         {
                                             Title = card[j].cardTitle,
@@ -471,29 +480,16 @@ namespace SecCsChatBotDemo
 
                     //
                     var intentArray = intentList.ToArray();
-                    /*
-                    for (int i = 0; i < intentList.Count; i++)
-                    {
-                        Debug.WriteLine("* intentList[] :" + intentList[i]);
-
-                    }
-                    */
+ 
                     foreach (string intent in intentList)
                     {
                         Debug.WriteLine("* intent[] :" + intent);
                         //System.Console.WriteLine(prime);
                     }
                     Debug.WriteLine("intentList" + intentList);
-
-
-
+                    
                     Activity reply_err = activity.CreateReply();
-                    /*
-                    reply_err.Recipient = activity.From;
-                    reply_err.Type = "message";
-                    reply_err.Text = "I'm sorry. I do not know what you mean.";
-                    var reply1 = await connector.Conversations.SendToConversationAsync(reply_err);
-                    */
+ 
                     //
                     var luisIntent = userData.GetProperty<string>("luisIntent");
                     var luisEntity = userData.GetProperty<string>("luisEntity");
