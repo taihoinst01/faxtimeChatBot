@@ -56,10 +56,10 @@ namespace SecCsChatBotDemo
                 
 
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-
+                Debug.WriteLine("* dlg.Count : " + dlg.Count);
                 for (int n = 0; n < dlg.Count; n++)
                 {
-                    Debug.WriteLine("dlgId : " + n + "." + dlg[n].dlgId);
+                    Debug.WriteLine("* dlgId : " + n + "." + dlg[n].dlgId);
                     Activity reply2 = activity.CreateReply();
                     reply2.Recipient = activity.From;
                     reply2.Type = "message";
@@ -203,19 +203,11 @@ namespace SecCsChatBotDemo
                 }
                 DateTime endTime = DateTime.Now;
                 Debug.WriteLine("프로그램 수행시간 : {0}/ms", ((endTime - startTime).Milliseconds));
-
-                //
-
-                //  && activity.MembersAdded.Any(m => m.Id == activity.Recipient.Id)
                 Debug.WriteLine("* activity.Type : " + activity.Type);
-                Debug.WriteLine("* ActivityTypes.ConversationUpdate : " + ActivityTypes.ConversationUpdate);
-                //Debug.WriteLine("* m => m.Id : " + m => m.Id);
                 Debug.WriteLine("* activity.Recipient.Id : " + activity.Recipient.Id);
                 Debug.WriteLine("* activity.ServiceUrl : " + activity.ServiceUrl);
                 var welcome = "";
                 var welcomeMsg = "";
-                //welcome = await connector.Conversations.SendToConversationAsync(welcomeMsg);
-
 
             }
             else if (activity.Type == ActivityTypes.Message)
@@ -266,11 +258,15 @@ namespace SecCsChatBotDemo
                     // 
                     if (intent == "customerInfo")
                     {
-                        
                         var luisCustomerInfo = userData.GetProperty<string>("luisCustomerInfo");
+                        if (entity == "김설현")
+                        {
+                            luisCustomerInfo = "";
+                        }
+                        //var luisCustomerInfo = userData.GetProperty<string>("luisCustomerInfo");
                         luisCustomerInfo = luisCustomerInfo + "\n" + orgMent;
                         userData.SetProperty<string>("luisCustomerInfo", luisCustomerInfo);
-                        Debug.WriteLine("1-1.intent : customerInfo || input : " + orgMent + " || luisCustomerInfo : " + luisCustomerInfo);
+                        Debug.WriteLine("1-1.intent : customerInfo || input : " + orgMent + " || entity : " + entity + " || luisCustomerInfo : " + luisCustomerInfo);
 
                     }
 
