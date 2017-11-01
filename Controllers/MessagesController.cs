@@ -46,7 +46,7 @@ namespace SecCsChatBotDemo
             var intentList = new List<string>();
             var entityList = new List<string>();
 
-            if (activity.Type == ActivityTypes.ConversationUpdate)
+            if (activity.Type == ActivityTypes.ConversationUpdate && activity.MembersAdded.Any(m => m.Id == activity.Recipient.Id))
             {
                 DateTime startTime = DateTime.Now;
                 Debug.WriteLine("* DB conn : " + activity.Type);
