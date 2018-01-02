@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace SecCsChatBotDemo.Models
+namespace AnimationChatBot.Models
 {
     public class LuisList
     {
         public int dlgId;
-        public string dlgOrderNo;
+        public int dlgOrderNo;
 
         public string dlgIntent;
         public string dlgEntities;
