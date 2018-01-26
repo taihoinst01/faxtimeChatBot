@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace AnimationChatBot.Models
+namespace FaxtimeChatBot.Models
 {
     [Serializable]
     public class ConversationHistory

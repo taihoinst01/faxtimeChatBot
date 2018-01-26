@@ -9,19 +9,19 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
-using AnimationChatBot.DB;
-using AnimationChatBot.Models;
+using FaxtimeChatBot.DB;
+using FaxtimeChatBot.Models;
 using Newtonsoft.Json.Linq;
 
 using System.Configuration;
 using System.Web.Configuration;
-using AnimationChatBot.Dialogs;
+using FaxtimeChatBot.Dialogs;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using Microsoft.Bot.Builder.ConnectorEx;
 
-namespace AnimationChatBot
+namespace FaxtimeChatBot
 {
     [BotAuthentication]
     public class MessagesController : ApiController
@@ -253,7 +253,7 @@ namespace AnimationChatBot
                     string orgMent = activity.Text;
 
 
-                    apiFlag = "";
+                    apiFlag = "COMMON";
 
                     //대화 시작 시간
                     startTime = DateTime.Now;
@@ -515,6 +515,9 @@ namespace AnimationChatBot
                             beforeMessgaeText = message.ToString();
 
                             Debug.WriteLine("SERARCH MESSAGE : " + message);
+                            //네이버 기사 검색
+                            sorryflag = true;
+                            /*
                             if ((message != null) && message.Trim().Length > 0)
                             {
                                 //Naver Search API
@@ -672,8 +675,10 @@ namespace AnimationChatBot
                             {
                                 sorryflag = true;
                             }
+                            */
                             if (sorryflag)
                             {
+                                //Sorry Message 
                                 int sorryMessageCheck = db.SelectUserQueryErrorMessageCheck(activity.Conversation.Id, MessagesController.chatBotID);
 
                                 ++MessagesController.sorryMessageCnt;

@@ -1,4 +1,4 @@
-﻿using AnimationChatBot.Models;
+﻿using FaxtimeChatBot.Models;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace AnimationChatBot.DB
+namespace FaxtimeChatBot.DB
 {
     public class DButil
     {

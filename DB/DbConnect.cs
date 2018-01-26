@@ -1,5 +1,5 @@
-﻿using AnimationChatBot.Dialogs;
-using AnimationChatBot.Models;
+﻿using FaxtimeChatBot.Dialogs;
+using FaxtimeChatBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Configuration;
 
-namespace AnimationChatBot.DB
+namespace FaxtimeChatBot.DB
 {
     public class DbConnect
     {

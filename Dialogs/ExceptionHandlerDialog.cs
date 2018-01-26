@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace AnimationChatBot.Dialogs
+namespace FaxtimeChatBot.Dialogs
 {
     [Serializable]
     public class ExceptionHandlerDialog<T> : IDialog<object>

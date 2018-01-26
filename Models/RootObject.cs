@@ -1,4 +1,4 @@
-﻿namespace AnimationChatBot.Models
+﻿namespace FaxtimeChatBot.Models
 {
 	using Newtonsoft.Json;
 	using System;
