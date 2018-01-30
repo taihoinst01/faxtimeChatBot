@@ -632,7 +632,7 @@ namespace FaxtimeChatBot.DB
         //public List<ConfList> SelectConfig(string config_type)
         {
             SqlDataReader rdr = null;
-            List<ConfList> conflist = new List<ConfList>()
+            List<ConfList> conflist = new List<ConfList>();
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
