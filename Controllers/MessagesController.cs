@@ -26,7 +26,7 @@ namespace FaxtimeChatBot
     [BotAuthentication]
     public class MessagesController : ApiController
     {
-
+        //MessagesController
         public static readonly string TEXTDLG = "2";
         public static readonly string CARDDLG = "3";
         public static readonly string MEDIADLG = "4";
