@@ -280,8 +280,9 @@ namespace FaxtimeChatBot
                         queryStr = orgMent;
                         //인텐트 엔티티 검출
                         //캐시 체크
-                        //cashOrgMent = Regex.Replace(orgMent, @"[^a-zA-Z0-9ㄱ-힣]", "", RegexOptions.Singleline);
-                        //cacheList = db.CacheChk(cashOrgMent.Replace(" ", ""));                     // 캐시 체크
+                        cashOrgMent = Regex.Replace(orgMent, @"[^a-zA-Z0-9ㄱ-힣]", "", RegexOptions.Singleline);
+                        Debug.WriteLine("cashOrgment :: " + cashOrgMent);
+                        cacheList = db.CacheChk(cashOrgMent.Replace(" ", ""));                     // 캐시 체크
 
 
                         //캐시에 없을 경우
@@ -292,40 +293,48 @@ namespace FaxtimeChatBot
                         //    cacheList.luisId = dbutil.GetMultiLUIS(orgMent);
                         //}
 
-                        //if (cacheList != null && cacheList.luisIntent != null)
-                        //{
-                        //    if (cacheList.luisIntent.Contains("testdrive") || cacheList.luisIntent.Contains("branch"))
-                        //    {
-                        //        apiFlag = "TESTDRIVE";
-                        //    }
-                        //    else if (cacheList.luisIntent.Contains("quot"))
-                        //    {
-                        //        apiFlag = "QUOT";
-                        //    }
-                        //    else if (cacheList.luisIntent.Contains("recommend "))
-                        //    {
-                        //        apiFlag = "RECOMMEND";
-                        //    }
-                        //    else
-                        //    {
-                        //        apiFlag = "COMMON";
-                        //    }
-                        //    DButil.HistoryLog("cacheList.luisIntent : " + cacheList.luisIntent);
-                        //}
+                        if (cacheList != null && cacheList.luisIntent != null)
+                        {
+                            if (cacheList.luisIntent.Contains("testdrive") || cacheList.luisIntent.Contains("branch"))
+                            {
+                                apiFlag = "TESTDRIVE";
+                            }
+                            else if (cacheList.luisIntent.Contains("quot"))
+                            {
+                                apiFlag = "QUOT";
+                            }
+                            else if (cacheList.luisIntent.Contains("recommend "))
+                            {
+                                apiFlag = "RECOMMEND";
+                            }
+                            else
+                            {
+                                apiFlag = "COMMON";
+                            }
+                            DButil.HistoryLog("cacheList.luisIntent : " + cacheList.luisIntent);
+                        }
 
-                        //luisId = cacheList.luisId;
-                        //luisIntent = cacheList.luisIntent;
-                        //luisEntities = cacheList.luisEntities;
+                        luisId = cacheList.luisId;
+                        luisIntent = cacheList.luisIntent;
+                        luisEntities = cacheList.luisEntities;
 
-                        String fullentity = db.SearchCommonEntities;
-                        DButil.HistoryLog("fullentity : " + fullentity);
+                        //Debug.WriteLine("luisId :: " + luisId);
+                        //Debug.WriteLine("luisIntent :: " + luisIntent);
+                        //Debug.WriteLine("luisEntities :: " + luisEntities);
 
-                        relationList = db.DefineTypeChkSpare(fullentity);
+                        //String fullentity = db.SearchCommonEntities;
+                        //DButil.HistoryLog("fullentity : " + fullentity);
+                        //Debug.WriteLine("fullentity ::: " + fullentity);
+
+                        //relationList = db.DefineTypeChkSpare(fullentity);
+
+                        relationList = db.DefineTypeChkSpare(cashOrgMent);
                         apiFlag = "COMMON";
+                        Debug.WriteLine("relationListCnt ::: " + relationList.Count);
 
-                        
 
-                        
+
+
                         if (apiFlag.Equals("COMMON") && relationList.Count > 0)
                         {
 
